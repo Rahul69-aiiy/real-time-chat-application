@@ -3,7 +3,6 @@ import assets from '../assets/assets'
 import { AuthContext } from '../../context/AuthContext';
 
 function LoginPage() {
-
   const [currState, setCurrState] = useState("Login");
   const [fullName, setFullName] = useState("")
   const [email, setEmail] = useState("");
@@ -12,7 +11,6 @@ function LoginPage() {
   const [isDataSubmitted, setIsDataSubmitted] = useState(false)
 
   const {login} = useContext(AuthContext)
-  
 
   const onSubmitHandler = (event) => {
     event.preventDefault();
@@ -32,7 +30,6 @@ function LoginPage() {
       <img src={assets.logo_big} alt="" className='w-[min(20vw,250px)]' />
 
       {/* right  */}
-
       <form onSubmit={onSubmitHandler} className='border-2 bg-white/8 text-white border-gray-500 p-6 flex flex-col gap-6 rounded-lg shadow-lg'>
         <h2 className='font-medium text-2xl flex justify-between items-center'>
           {currState}
@@ -41,7 +38,7 @@ function LoginPage() {
 
         {
           currState === "Sign up" && !isDataSubmitted && (
-            <input onChange={(e) => setFullName(e.target.value)} value={fullName} type="text" className='p-2 border border-gray-500 rounded-md focus:outline-none' placeholder='Full Name' required />
+            <input onChange={(e) => setFullName(e.target.value)} value={fullName} type="text" className='p-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500' placeholder='Full Name' required />
           )
         }
 
@@ -63,7 +60,7 @@ function LoginPage() {
         </button>
 
         <div className="flex items-center gap-2 text-sm text-gray-500">
-          <input type="checkbox"/>
+          <input type="checkbox" required/>
           <p>Agree to the terms of use & privacy policy.</p>
         </div>
         

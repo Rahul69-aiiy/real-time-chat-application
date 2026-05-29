@@ -39,6 +39,7 @@ function ChatContainer() {
       const file = e.target.files[0];
       if(!file || !file.type.startsWith("image/")) {
         toast.error("select an image file")
+        e.target.value = "";
         return;
       }
 
