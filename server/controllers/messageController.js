@@ -22,7 +22,7 @@ export const getUsersForSidebar = async(req, res) => {
             }
         })
 
-        await Promise.all(promises);
+        await Promise.all(promises); // wait for async call back functions to finish
         res.json({success: true, users: filteredUsers, unseenMessages})
     } catch(error) {
         console.log(error.message)
