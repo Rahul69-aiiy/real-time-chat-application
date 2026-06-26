@@ -5,6 +5,7 @@ import http from "http";
 import { connectDB } from "./lib/db.js";
 import userRouter from "./routes/userRoutes.js";
 import messageRouter from "./routes/messageRoutes.js";
+import groupRouter from "./routes/groupRoutes.js";
 import { Server } from "socket.io";
 
 // Create Express app and HTTP server
@@ -29,6 +30,35 @@ io.on("connection", (socket) => {
     // Emit online users to all connected clients
     io.emit("getOnlineUsers", Object.keys(userSocketMap))
 
+    // Video Call events
+    socket.on("callUser", ({ from, to, roomId }) => {
+        const targetSocketId = userSocketMap[to];
+        if (targetSocketId) {
+            io.to(targetSocketId).emit("incomingCall", { from, roomId });
+        }
+    });
+
+    socket.on("declineCall", ({ to }) => {
+        const targetSocketId = userSocketMap[to];
+        if (targetSocketId) {
+            io.to(targetSocketId).emit("callDeclined");
+        }
+    });
+
+    socket.on("acceptCall", ({ to, roomId }) => {
+        const targetSocketId = userSocketMap[to];
+        if (targetSocketId) {
+            io.to(targetSocketId).emit("callAccepted", { roomId });
+        }
+    });
+
+    socket.on("endCall", ({ to }) => {
+        const targetSocketId = userSocketMap[to];
+        if (targetSocketId) {
+            io.to(targetSocketId).emit("callEnded");
+        }
+    });
+
     socket.on("disconnect", () => {
         console.log("User Disconnected", userId)
         delete userSocketMap[userId]
@@ -44,6 +74,7 @@ app.use(cors())
 app.use("/api/status", (req, res) => res.send("Server is live"));
 app.use("/api/auth", userRouter)
 app.use("/api/messages", messageRouter)
+app.use("/api/groups", groupRouter)
 
 // Connect to MongoDB
 await connectDB();
