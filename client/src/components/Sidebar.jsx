@@ -28,6 +28,7 @@ function Sidebar() {
   const [selectedMembers, setSelectedMembers] = useState([]);
   const [groupPicPreview, setGroupPicPreview] = useState("");
   const [groupPicBase64, setGroupPicBase64] = useState("");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const filteredUsers = input
     ? users.filter((user) => user.fullName.toLowerCase().includes(input.toLowerCase()))
@@ -94,7 +95,7 @@ function Sidebar() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#161229]">
+    <div className={`flex flex-col h-full bg-[#161229] ${selectedUser ? "max-md:hidden" : ""}`}>
       <div className="pb-3 border-b border-gray-700/50">
         <div className="mx-6 my-3">
           <div className="flex justify-between items-center">
@@ -103,17 +104,23 @@ function Sidebar() {
               alt="logo"
               className="max-h-6 cursor-pointer"
             />
-            <div className="relative py-2 group">
+            <div className="relative py-2">
               <img
+                onClick={() => setIsMenuOpen((prev) => !prev)}
                 src={assets.menu_icon}
                 alt="Menu"
                 className="max-h-5 cursor-pointer"
               />
-              <div className="absolute top-full right-0 z-20 w-32 p-5 rounded-md bg-[#282142] border border-gray-600 text-gray-100 hidden group-hover:block">
-                <p onClick={() => navigate("/profile")} className="cursor-pointer text-sm">Edit Profile</p>
-                <hr className="my-2 border-t border-gray-500" />
-                <p onClick={() => logout()} className="cursor-pointer text-sm">Logout</p>
-              </div>
+              {isMenuOpen && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setIsMenuOpen(false)}></div>
+                  <div className="absolute top-full right-0 z-20 w-32 p-5 rounded-md bg-[#282142] border border-gray-600 text-gray-100">
+                    <p onClick={() => { navigate("/profile"); setIsMenuOpen(false); }} className="cursor-pointer text-sm hover:text-purple-400 transition-colors">Edit Profile</p>
+                    <hr className="my-2 border-t border-gray-500" />
+                    <p onClick={() => { logout(); setIsMenuOpen(false); }} className="cursor-pointer text-sm hover:text-purple-400 transition-colors">Logout</p>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
