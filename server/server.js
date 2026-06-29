@@ -30,6 +30,13 @@ io.on("connection", (socket) => {
     // Emit online users to all connected clients
     io.emit("getOnlineUsers", Object.keys(userSocketMap))
 
+    // Group Chat events
+    socket.on("joinGroupRooms", (groupIds) => {
+        if (Array.isArray(groupIds)) {
+            groupIds.forEach(id => socket.join(id.toString()));
+        }
+    });
+
     // Video Call events
     socket.on("callUser", ({ from, to, roomId }) => {
         const targetSocketId = userSocketMap[to];

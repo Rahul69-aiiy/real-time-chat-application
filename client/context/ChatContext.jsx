@@ -14,7 +14,7 @@ export const ChatProvider = ({children}) => {
     
     // Video call state
     const [callState, setCallState] = useState({
-        status: "idle", // idle,  dialing, ringing, active
+        status: "idle", // idle, dialing, ringing, active
         room: null,
         participant: null
     });
@@ -68,6 +68,7 @@ export const ChatProvider = ({children}) => {
             const url = selectedUser.isGroup 
                 ? `/api/messages/group/send/${selectedUser._id}`
                 : `/api/messages/send/${selectedUser._id}`;
+
             const {data} = await axios.post(url, messageData);
             if(data.success) {
                 setMessages((prevMessages) => [...prevMessages, data.newMessage])
@@ -132,6 +133,7 @@ export const ChatProvider = ({children}) => {
             toast.error(error.message)
         }
     }
+
 
     // Video Call Handlers
     const initiateCall = (targetUser) => {
@@ -218,9 +220,43 @@ export const ChatProvider = ({children}) => {
         };
     }, [socket]);
 
+    // Join group socket rooms whenever socket or groups change
+    useEffect(() => {
+        if (socket && groups.length > 0) {
+            const groupIds = groups.map(g => g._id);
+            socket.emit("joinGroupRooms", groupIds);
+        }
+    }, [socket, groups]);
+
+    // function to update group details 
+    const updateGroup = async (groupId, updateData) => {
+        try {
+            const {data} = await axios.put(`/api/groups/${groupId}`, updateData)
+            if(data.success) {
+
+                setGroups(prevGroups =>
+                    prevGroups.map(g =>
+                        g._id === groupId ? data.group : g
+                    )
+                );  
+                
+                setSelectedUser(prev =>
+                    prev?._id === groupId ? { ...data.group, isGroup: true } : prev
+                );
+
+                toast.success(data.message)
+                return data.group
+            } else {
+                toast.error(data.message)
+            }
+        } catch(error) {
+            toast.error(error.message)
+        }
+    }
+
     const value = {
         messages, users, groups, selectedUser, getMessages, getUsers, getGroups, createGroup, sendMessage, setSelectedUser, setUnseenMessages, unseenMessages,
-        callState, setCallState, initiateCall, acceptIncomingCall, declineIncomingCall, terminateCall, joinGroupCall
+        callState, setCallState, initiateCall, acceptIncomingCall, declineIncomingCall, terminateCall, joinGroupCall, updateGroup
     }
 
     return (

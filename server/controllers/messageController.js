@@ -10,6 +10,8 @@ export const getUsersForSidebar = async(req, res) => {
         const userId = req.user._id;
         const filteredUsers = await User.find({_id: {$ne: userId}}).select("-password")
 
+        const userGroups = await Group.find({ members: userId })
+
         // count the number of messages not seen
         const unseenMessages = {}
         const promises = filteredUsers.map(async(user) => {
@@ -23,7 +25,18 @@ export const getUsersForSidebar = async(req, res) => {
             }
         })
 
-        await Promise.all(promises); // wait for async call back functions to finish
+        const groupPromises = userGroups.map(async(group) => {
+            const count = await Message.countDocuments({
+                groupId: group._id,
+                senderId: { $ne: userId },
+                seenBy: { $ne: userId }
+            })
+            if(count > 0) {
+                unseenMessages[group._id] = count;
+            }
+        })
+
+        await Promise.all([...promises, ...groupPromises]); 
         res.json({success: true, users: filteredUsers, unseenMessages})
     } catch(error) {
         console.log(error.message)
@@ -102,7 +115,14 @@ export const sendMessage = async (req, res) => {
 export const getGroupMessages = async (req, res) => {
     try {
         const { groupId } = req.params;
+        const myId = req.user._id;
         const messages = await Message.find({ groupId });
+
+        await Message.updateMany(
+            { groupId, senderId: { $ne: myId }, seenBy: { $ne: myId } },
+            { $addToSet: { seenBy: myId } }
+        );
+
         res.json({ success: true, messages });
     } catch (error) {
         console.log(error.message);
@@ -130,17 +150,12 @@ export const sendGroupMessage = async (req, res) => {
             image: imageUrl
         });
 
-        // Find group to notify members
-        const group = await Group.findById(groupId);
-        if (group) {
-            group.members.forEach((memberId) => {
-                if (memberId.toString() !== senderId.toString()) {
-                    const socketId = userSocketMap[memberId.toString()];
-                    if (socketId) {
-                        io.to(socketId).emit("newMessage", newMessage);
-                    }
-                }
-            });
+        // Broadcast to all users in the group room, except the sender
+        const senderSocketId = userSocketMap[senderId.toString()];
+        if (senderSocketId) {
+            io.to(groupId).except(senderSocketId).emit("newMessage", newMessage);
+        } else {
+            io.to(groupId).emit("newMessage", newMessage);
         }
 
         res.json({ success: true, newMessage });

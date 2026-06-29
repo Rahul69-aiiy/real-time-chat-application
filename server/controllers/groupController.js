@@ -52,3 +52,38 @@ export const getGroups = async (req, res) => {
         res.json({ success: false, message: error.message });
     }
 };
+
+// Update group details 
+export const updateGroup = async (req, res) => {
+    try {
+        const { groupId } = req.params;
+        const { name, description, profilePic } = req.body;
+        const userId = req.user._id;
+
+        const group = await Group.findById(groupId);
+        if (!group) {
+            return res.json({ success: false, message: "Group not found" });
+        }
+
+        // Only group members can update it
+        if (!group.members.includes(userId.toString())) {
+            return res.json({ success: false, message: "Unauthorized to update this group" });
+        }
+
+        const updates = {};
+        if (name) updates.name = name;
+        if (description !== undefined) updates.description = description;
+        if (profilePic) {
+            const uploadResponse = await cloudinary.uploader.upload(profilePic);
+            updates.profilePic = uploadResponse.secure_url;
+        }
+
+        const updatedGroup = await Group.findByIdAndUpdate(groupId, updates, { new: true }).populate("members", "-password");
+
+        res.json({ success: true, group: updatedGroup, message: "Group updated successfully" });
+    } catch (error) {
+        console.log(error.message);
+        res.json({ success: false, message: error.message });
+    }
+};
+

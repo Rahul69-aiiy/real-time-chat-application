@@ -127,7 +127,7 @@ function Sidebar() {
             }}
             className={`flex-1 py-1.5 text-sm rounded-md transition-all cursor-pointer ${
               activeTab === "chats"
-                ? "bg-violet-600 text-white shadow-md font-medium"
+                ? "bg-gradient-to-r from-purple-400 to-violet-600 text-white shadow-md font-medium"
                 : "text-gray-400 hover:text-white"
             }`}
           >
@@ -140,7 +140,7 @@ function Sidebar() {
             }}
             className={`flex-1 py-1.5 text-sm rounded-md transition-all cursor-pointer ${
               activeTab === "groups"
-                ? "bg-violet-600 text-white shadow-md font-medium"
+                ? "bg-gradient-to-r from-purple-400 to-violet-600 text-white shadow-md font-medium"
                 : "text-gray-400 hover:text-white"
             }`}
           >
@@ -199,13 +199,6 @@ function Sidebar() {
           </div>
         ) : (
           <div className="flex flex-col">
-            <button
-              onClick={() => setShowModal(true)}
-              className="mx-4 my-3 py-2 px-4 rounded-xl bg-gradient-to-r from-purple-500 to-violet-600 text-white text-sm font-semibold hover:from-purple-600 hover:to-violet-700 transition-all shadow-lg flex items-center justify-center gap-1 cursor-pointer"
-            >
-              <span>+ Create Group</span>
-            </button>
-
             {filteredGroups.map((group, index) => (
               <div
                 onClick={() => {
@@ -224,7 +217,7 @@ function Sidebar() {
                     className="w-[35px] h-[35px] rounded-full object-cover"
                   />
                 ) : (
-                  <div className="w-[35px] h-[35px] rounded-full bg-gradient-to-tr from-purple-500 to-violet-600 flex items-center justify-center text-white font-bold text-sm">
+                  <div className="w-[35px] h-[35px] rounded-full bg-gradient-to-tr from-purple-400 to-violet-600 flex items-center justify-center text-white font-bold text-sm">
                     {group.name.substring(0, 2).toUpperCase()}
                   </div>
                 )}
@@ -243,6 +236,17 @@ function Sidebar() {
         )}
       </div>
 
+      {activeTab === "groups" && (
+        <div className="p-4 border-t border-gray-700/50 bg-[#161229] flex justify-center">
+          <button
+            onClick={() => setShowModal(true)}
+            className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-purple-400 to-violet-600 text-white text-sm font-semibold hover:brightness-110 transition-all shadow-lg flex items-center justify-center gap-1 cursor-pointer"
+          >
+            <span>+ Create Group</span>
+          </button>
+        </div>
+      )}
+
       {/* Create Group Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
@@ -251,7 +255,7 @@ function Sidebar() {
             <form onSubmit={handleCreateGroupSubmit} className="space-y-4">
               <div className="flex flex-col items-center gap-2 mb-2">
                 <div className="relative group">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-purple-500 to-violet-600 flex items-center justify-center text-white font-bold text-xl border-2 border-purple-400 overflow-hidden">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-purple-400 to-violet-600 flex items-center justify-center text-white font-bold text-xl overflow-hidden">
                     {groupPicPreview ? (
                       <img src={groupPicPreview} alt="Preview" className="w-full h-full object-cover" />
                     ) : (
@@ -336,7 +340,7 @@ function Sidebar() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold rounded-lg transition-colors cursor-pointer"
+                  className="px-4 py-2 bg-gradient-to-r from-purple-400 to-violet-600 text-white text-sm font-semibold rounded-lg hover:brightness-110 transition-all cursor-pointer"
                 >
                   Create
                 </button>

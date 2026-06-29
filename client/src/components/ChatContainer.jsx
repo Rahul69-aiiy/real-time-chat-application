@@ -57,13 +57,14 @@ function ChatContainer() {
   const handleStartCall = () => {
     if (selectedUser.isGroup) {
       const groupRoomId = `group-${selectedUser._id}`;
-      sendMessage({ text: `📹 Video Call started. Click here to join call.` });
+      sendMessage({ text: `Video Call started. Click here to join call.` });
       joinGroupCall(groupRoomId);
     } else {
       if (!onlineUsers.includes(selectedUser._id)) {
         toast.error(`${selectedUser.fullName} is offline`);
         return;
       }
+      sendMessage({ text: `Video Call started.` });
       initiateCall(selectedUser);
     }
   }
@@ -106,7 +107,7 @@ function ChatContainer() {
             selectedUser.profilePic ? (
               <img src={selectedUser.profilePic} alt="" className='w-8 h-8 rounded-full object-cover'/>
             ) : (
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-violet-600 flex items-center justify-center text-white font-bold text-xs">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-400 to-violet-600 flex items-center justify-center text-white font-bold text-xs">
                 {selectedUser.name.substring(0, 2).toUpperCase()}
               </div>
             )
@@ -154,20 +155,22 @@ function ChatContainer() {
                 {selectedUser.isGroup && msg.senderId !== authUser._id && (
                   <span className="text-[10px] text-purple-300 ml-1 mb-0.5">{getSenderName(msg.senderId)}</span>
                 )}
-                {msg.text && msg.text.startsWith("📹 Video Call started") ? (
-                  <div className="p-3 bg-purple-950/60 border border-purple-500/30 rounded-xl mb-8 flex flex-col gap-2 max-w-[220px]">
+                {msg.text && (msg.text.startsWith("Video Call started")) ? (
+                  <div className="p-3 bg-violet-500/30 border border-violet-500/30 rounded-xl mb-8 flex flex-col gap-2 max-w-[220px]">
                     <div className="flex items-center gap-2 text-purple-300">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
                       </svg>
-                      <span className="text-xs font-semibold">Group Video Call</span>
+                      <span className="text-xs font-semibold">{selectedUser.isGroup ? "Group Video Call" : "Video Call Log"}</span>
                     </div>
-                    <button
-                      onClick={() => joinGroupCall(`group-${selectedUser._id}`)}
-                      className="py-1 px-3 bg-purple-600 hover:bg-purple-700 active:scale-95 transition-all text-white text-xs font-bold rounded-lg cursor-pointer shadow"
-                    >
-                      Join Call
-                    </button>
+                    {selectedUser.isGroup && (
+                      <button
+                        onClick={() => joinGroupCall(`group-${selectedUser._id}`)}
+                        className="py-1 px-3 bg-gradient-to-r from-purple-400 to-violet-600 hover:brightness-110 active:scale-95 transition-all text-white text-xs font-bold rounded-lg cursor-pointer shadow"
+                      >
+                        Join Call
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <p className={`p-2 max-w-[200px] md:text-sm font-light rounded-lg mb-8 break-all bg-violet-500/30 text-white ${msg.senderId === authUser._id ? 'rounded-br-none' : 'rounded-bl-none'}`}>{msg.text}</p>
