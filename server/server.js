@@ -1,5 +1,10 @@
+import dotenv from "dotenv";
+
+if(process.env.NODE_ENV != "production") {
+    dotenv.config();
+}
+
 import express from "express"
-import "dotenv/config";
 import cors from "cors";
 import http from "http";
 import { connectDB } from "./lib/db.js";
@@ -7,6 +12,8 @@ import userRouter from "./routes/userRoutes.js";
 import messageRouter from "./routes/messageRoutes.js";
 import groupRouter from "./routes/groupRoutes.js";
 import { Server } from "socket.io";
+
+const PORT = process.env.PORT || 5000;
 
 // Create Express app and HTTP server
 const app = express()
@@ -86,9 +93,4 @@ app.use("/api/groups", groupRouter)
 // Connect to MongoDB
 await connectDB();
 
-if(process.env.NODE_ENV != "production") {
-    const PORT = process.env.PORT || 5000;
-    server.listen(PORT, () => console.log("Server is running on PORT: " + PORT))
-}
- 
-export default server
+server.listen(PORT, () => console.log("Server is running on PORT: " + PORT))
