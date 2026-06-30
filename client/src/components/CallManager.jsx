@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useRef } from "react";
-import { ChatContext } from "../../context/ChatContext";
+import { CallContext } from "../../context/CallContext";
 import { AuthContext } from "../../context/AuthContext";
 import assets from "../assets/assets";
 
 function CallManager() {
-  const { callState, acceptIncomingCall, declineIncomingCall, terminateCall } = useContext(ChatContext);
+  const { callState, acceptIncomingCall, declineIncomingCall, terminateCall } = useContext(CallContext);
   const { authUser } = useContext(AuthContext);
   const jitsiContainerRef = useRef(null);
 

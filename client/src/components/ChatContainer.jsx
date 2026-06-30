@@ -2,12 +2,14 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import assets from '../assets/assets'
 import { formatMessageTime } from '../lib/utils';
 import { ChatContext } from '../../context/ChatContext';
+import { CallContext } from '../../context/CallContext';
 import { AuthContext } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 
 function ChatContainer() {
 
-  const {messages, users, selectedUser, setSelectedUser, sendMessage, getMessages, initiateCall, joinGroupCall} = useContext(ChatContext)
+  const {messages, users, selectedUser, setSelectedUser, sendMessage, getMessages} = useContext(ChatContext)
+  const { initiateCall, joinGroupCall } = useContext(CallContext)
   const scrollEnd = useRef();
 
   const {authUser, onlineUsers} = useContext(AuthContext)
@@ -58,7 +60,7 @@ function ChatContainer() {
     if (selectedUser.isGroup) {
       const groupRoomId = `group-${selectedUser._id}`;
       sendMessage({ text: `Video Call started. Click here to join call.` });
-      joinGroupCall(groupRoomId);
+      joinGroupCall(groupRoomId, selectedUser.name);
     } else {
       if (!onlineUsers.includes(selectedUser._id)) {
         toast.error(`${selectedUser.fullName} is offline`);
@@ -165,7 +167,7 @@ function ChatContainer() {
                     </div>
                     {selectedUser.isGroup && (
                       <button
-                        onClick={() => joinGroupCall(`group-${selectedUser._id}`)}
+                        onClick={() => joinGroupCall(`group-${selectedUser._id}`, selectedUser.name)}
                         className="py-1 px-3 bg-gradient-to-r from-purple-400 to-violet-600 hover:brightness-110 active:scale-95 transition-all text-white text-xs font-bold rounded-lg cursor-pointer shadow"
                       >
                         Join Call
